@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Contacts</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://momentjs.com/downloads/moment.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <style>
+        .loading {
+            width: 100%;
+            font-size: 28px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container pb-5">
+        <h1 class="pt-3">Contactos</h1>
+        <div class="date-selector">
+            <div class="form-group w-25 pt-3">
+                <input id="date-input" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="contactos">
+            <table class="table table-hover table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Insertion Date</th>
+                        <th scope="col">Message</th>
+                    </tr>
+                </thead>
+                <tbody id="elements">
+
+                </tbody>
+            </table>
+
+            <div class="loading">
+                cargando...
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function dateTime() {
+            let date = new Date();
+            let dateInput = document.getElementById('date-input');
+            dateInput.value = moment(date).format('DD/MM/YYYY');
+
+            flatpickr(dateInput, {
+                maxDate: 'today',
+                dateFormat: "d-m-Y",
+                onChange: function(selectedDate) {
+                    console.log(moment(selectedDate[0]).format('YYYY-MM-DD'));
+                    getContacts(selectedDate[0]);
+                }
+            });
+        }
+
+        let elements = document.getElementById('elements');
+
+        function getContacts(date) {
+            elements.innerHTML = '';
+            var fecha = moment(date).format('YYYY-MM-DD')
+            fetch(`http://localhost:54419/api/Contacts?date=${fecha}`)
+                .then(resp => resp.json())
+                .then(contactos => {
+                    document.querySelector('.loading').style.display = 'none';
+                    const contacts = contactos;
+                    contactos.forEach((element, index) => {
+                        let fecha = moment(element.insertionDate).format('DD/MM/YYYY');
+                        console.log(element);
+                        elements.innerHTML += `<tr>
+                        <th scope="row">${index + 1}</th>
+                        <td>${element.name}</td>
+                        <td>${element.email}</td>
+                        <td>${fecha}</td>
+                        <td>${element.message}</td>
+                    </tr>`
+
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                    elements.innerHTML = '😭'
+                })
+        }
+
+        dateTime();
+
+        let date = new Date();
+
+        getContacts(moment(date).format('YYYY-MM-DD'));
+    </script>
+</body>
+
+</html>
