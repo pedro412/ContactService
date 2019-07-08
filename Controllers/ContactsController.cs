@@ -132,7 +132,7 @@ namespace ContactService.Controllers
             // try catch!
             SmtpClient smtpClient = new SmtpClient("smtp-mail.outlook.com", 587);
             smtpClient.UseDefaultCredentials = false;
-            smtpClient.Credentials = new System.Net.NetworkCredential("pedro.alvarez412@outlook.com", "Pedro0906+-");
+            smtpClient.Credentials = new System.Net.NetworkCredential("pedro.alvarez412@outlook.com", "*****");
             smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtpClient.EnableSsl = true;
             MailMessage mail = new MailMessage();
